@@ -1,0 +1,41 @@
+---
+import PageHeader from "@/components/Header/PageHeader";
+import Layout from "../layouts/Layout.astro";
+import PlaylistItemCard from "@/components/Card/PlaylistItemCard";
+
+import { getRandomAccentColor } from "@/lib/colors";
+import { fetchData } from "@/lib/fetchData";
+const randomColor = getRandomAccentColor();
+
+const userEmail = Astro.cookies.get("e")?.value || "";
+const playlists =
+  (await fetchData(
+    `get-user-playlists?email=${encodeURIComponent(userEmail)}`
+  )) || [];
+
+---
+
+<Layout title="Library - KhorMusic">
+  <div
+    id="playlist-container"
+    class="relative transition-all duration-1000"
+    style={`background-color: ${randomColor};`}
+  >
+    <PageHeader client:load />
+
+    <div class="relative z-10 px-4 xs:px-8 pt-8 mb-8">
+      <div class="flex flex-wrap gap-6 s550:gap-10 justify-evenly s550:justify-start">
+        {
+          playlists.map((playlist) => (
+            <PlaylistItemCard playlist={playlist} client:load />
+          ))
+        }
+      </div>
+
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/80 -z-[1]"
+      >
+      </div>
+    </div>
+  </div>
+</Layout>

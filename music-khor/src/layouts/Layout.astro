@@ -1,0 +1,55 @@
+---
+import Sidebar from "@/components/Sidebar/Sidebar";
+import { ViewTransitions } from "astro:transitions";
+import "./layout.css";
+import Player from "@/components/Playerbar/Player";
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/png" href="/photo/music.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600&family=Oswald:wght@400;600&family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&family=Raleway:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ViewTransitions fallback="animate" />
+  </head>
+  <body class="dark">
+    <div class="flex flex-col h-screen">
+      <div class="flex-1 flex gap-2 p-2 items-stretch overflow-hidden">
+        <aside class="w-[350px] flex-col hidden lg:flex overflow-y-auto
+        h-[calc(100vh-10vh)] md:h-[calc(100vh-12vh)] lg:h-[calc(100vh-12vh)]">
+          <Sidebar client:load />
+        </aside>
+        <main class="rounded-lg bg-zinc-900 flex-1 mx-auto overflow-y-auto
+        h-[calc(100vh-10vh)] md:h-[calc(100vh-6vh)] lg:h-[calc(100vh-12vh)]">
+        <slot />
+        </main>
+      </div>
+      
+      <footer class="fixed bottom-0 inset-x-0 py-2 px-8 z-[999] bg-[#09090b]">
+        <section
+          id="mobile-slider-container"
+          class="absolute inset-x-0 bottom-[79px] sm:bottom-[88px] ml-2 mr-2"
+          style={{ zIndex: 1 }}
+        >
+        </section>
+        <Player client:load transition:name="media-player" transition:persist />
+      </footer>
+    </div>
+
+    <style is:global>
+      html {
+        font-family: "Inter", sans-serif;
+        background: #010101;
+        color: white;
+      }
+    </style>
+  </body>
+</html>

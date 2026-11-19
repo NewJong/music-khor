@@ -1,0 +1,17 @@
+---
+import PageHeader from "@/components/Header/PageHeader";
+import Layout from "../layouts/Layout.astro";
+import { getRandomAccentColor } from "@/lib/colors";
+const randomColor = getRandomAccentColor();
+import FlyPlaylists from "@/components/Card/FlyingPlaylists";
+---
+<Layout title="Navigator - KhorMusic">
+  <div
+    id="playlist-container"
+    class="relative transition-all duration-1000"
+    style={`background-color: ${randomColor};`}
+  >
+    <PageHeader client:load />
+    <FlyPlaylists client:load></FlyPlaylists>
+  </div>
+</Layout>

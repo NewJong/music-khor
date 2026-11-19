@@ -1,0 +1,99 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PageHeader from "@/components/Header/PageHeader";
+import MusicTable from "@/components/MusicsTable/MusicsTable";
+import CardPlayButton from "@/components/Buttons/CardPlayButton";
+import AddToPlaylistButton from "@/components/Buttons/AddPlaylistButton";
+import DotsButton from "@/components/Buttons/DotsButton";
+import { fetchData } from "@/lib/fetchData";
+import { getRandomAccentColor } from "@/lib/colors";
+
+const getTotalDuration = (songs) => {
+  return songs.reduce((total, song) => {
+    const duration = song.duration;
+    if (typeof duration === "number" && !isNaN(duration)) {
+      return total + duration;
+    }
+    return total;
+  }, 0);
+};
+const formatDuration = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}m ${remainingSeconds}s`;
+};
+const { id } = Astro.params;
+const randomColor = getRandomAccentColor();
+
+const playlist = (await fetchData(`get-playlist?id=${encodeURIComponent(id)}`)) || {
+  title: "Not found",
+  artists: "Unknown",
+  cover: "/photo/file.jpg",
+  songs: [],
+};
+const playListSongs = playlist.songs ?? [];
+
+const totalDuration = getTotalDuration(playListSongs);
+const formattedDuration = formatDuration(totalDuration);
+---
+
+<Layout title={"Playlist - " + playlist.title}>
+  <div
+    class="relative flex flex-col h-full bg-zinc-900 overflow-x-hidden
+    bg-gradient-to-t from-40% from-zinc-900 via-zinc-900/80
+    transition-all duration-1000"
+    style={`background-color: ${randomColor};`}
+  >
+    <PageHeader client:load />
+    <div class="flex flex-row gap-3 sm:gap-8 px-5 xs:px-6 mt-6 xs:mt-8 md:mt-10">
+      <picture class="aspect-square w-36 h-36 xs:w-40 xs:h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 flex-none">
+        <img
+          src={playlist?.cover}
+          alt={`Cover of ${playlist?.title}`}
+          class="object-cover w-full h-full shadow-lg rounded-lg"
+          transition:name={`playlist ${playlist?.id} image`}
+        />
+      </picture>
+
+      <div class="flex flex-col justify-between w-44 xs:w-full ">
+        <h2 class="flex flex-1 items-end text-sm xs:text-lg">Playlist</h2>
+        <h1 class="text-3xl xs:text-3xl lg:text-5xl font-bold block text-white overflow-hidden relative w-full h-16">
+          <div class={`whitespace-nowrap ${playlist.title.length >= 8 ? "animate-marquee" : ""} sm:animate-none`}>
+            <span>{playlist?.title || "Untitled"}</span>
+          </div>
+        </h1>
+
+        <div class="flex-1 flex items-end mb-2">
+          <div class="text-sm text-gray-300 font-normal overflow-hidden">
+            <div class={`whitespace-nowrap ${playlist.artists.length >= 30 ? "animate-marquee" : ""} sm:animate-none`}>
+              <span>{playlist?.artists}</span>
+            </div>
+            <p class="text-sm mt-1">
+              <span>{playListSongs.length} songs</span>, {formattedDuration}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2 flex-1 p-4 px-6 blur-100">
+      <div class="flex gap-4 xs:gap-6 ml-2 xs:ml-4 items-center">
+        <CardPlayButton playlistId={id} client:load size="large" />
+        {
+          playlist.type !== "liked" && (
+            <AddToPlaylistButton
+              playlistId={id}
+              client:load
+              size="nosmall"
+              option="nocard"
+            />
+          )
+        }
+        <DotsButton playlistId={id} songs={playListSongs} type={playlist?.type} title={playlist?.title}  client:load />
+      </div>
+      <section class="mt-1 xs:mt-3 pt-4">
+        <MusicTable playlistId={id} songs={playListSongs} client:load />
+      </section>
+    </div>
+  </div>
+</Layout>

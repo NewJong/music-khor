@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "strict": false,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "jsxImportSource": "react",
+    "ignoreDeprecations": "6.0"
+  }
+}
